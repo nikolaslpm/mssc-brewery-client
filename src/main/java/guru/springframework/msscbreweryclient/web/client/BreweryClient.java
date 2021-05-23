@@ -13,7 +13,7 @@ import java.util.UUID;
 /**
  * Created by jt on 2019-04-23.
  */
-@ConfigurationProperties(prefix = "sfg.brewery", ignoreUnknownFields = false)
+@ConfigurationProperties(prefix = "sfg.brewery")
 @Component
 public class BreweryClient {
 

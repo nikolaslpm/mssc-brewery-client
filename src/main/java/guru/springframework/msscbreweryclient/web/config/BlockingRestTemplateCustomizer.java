@@ -14,26 +14,32 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Created by jt on 2019-08-08.
  */
-@Component
+//@Component
 public class BlockingRestTemplateCustomizer implements RestTemplateCustomizer {
 
-    public ClientHttpRequestFactory clientHttpRequestFactory(){
+    private final ClientConnectionConfig connectionConfig;
+
+    public BlockingRestTemplateCustomizer(ClientConnectionConfig connectionConfig) {
+        this.connectionConfig = connectionConfig;
+    }
+
+    public ClientHttpRequestFactory clientHttpRequestFactory() {
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(100);
-        connectionManager.setDefaultMaxPerRoute(20);
+        connectionManager.setMaxTotal(connectionConfig.getMaxPoolConnection());
+        connectionManager.setDefaultMaxPerRoute(connectionConfig.getDefaultMaxPerRoute());
 
         RequestConfig requestConfig = RequestConfig
-                .custom()
-                .setConnectionRequestTimeout(3000)
-                .setSocketTimeout(3000)
-                .build();
+            .custom()
+            .setConnectionRequestTimeout(connectionConfig.getConnectionTimeout())
+            .setSocketTimeout(connectionConfig.getSocketTimeout())
+            .build();
 
         CloseableHttpClient httpClient = HttpClients
-                .custom()
-                .setConnectionManager(connectionManager)
-                .setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
-                .setDefaultRequestConfig(requestConfig)
-                .build();
+            .custom()
+            .setConnectionManager(connectionManager)
+            .setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
+            .setDefaultRequestConfig(requestConfig)
+            .build();
 
         return new HttpComponentsClientHttpRequestFactory(httpClient);
     }
